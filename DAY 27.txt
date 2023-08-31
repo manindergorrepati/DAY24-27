@@ -1,0 +1,122 @@
+1.  WRITE A PROGRAM TO CREATE A PF FILE 
+
+FMT PF .....A..........T.Name++++++RLen++TDpB......Functions++++++++++++++++++
+        *************** Beginning of data *************************************
+0001.00                                                                        
+0002.00      A          R STUREC                                               
+0003.00                                                                        
+0004.00      A            NAME          20A                                    
+0005.00      A            CLASS          2P 0                                  
+0006.00      A            DIV            1A                                    
+0007.00      A            ROLL           2P 0                                  
+0008.00      A          K CLASS                                                
+0009.00      A          K DIV                                                  
+0010.00      A          K ROLL                                                 
+        ****************** End of data ****************************************
+
+2. WRITE A PROGRAM TO USE COMPOSITE KEYED ACCESS PATH USING FREE FORMAT RPGLE 
+
+                                                                              
+  ** free                                                              
+        CTL-OPT DFTACTGRP(*NO);                                       
+        DCL-F STUDENT DISK USAGE(*INPUT) KEYED;                       
+        DCL-F STUDENTD WORKSTN SFILE(EMPSFL:RRN);                     
+        DCL-S RRN PACKED(3:0) INZ(*ZEROS);                            
+        DCL-PR FILL_STUDENT_LIST;                                     
+                *N PACKED(2:0);                                       
+                *N CHAR(1);                                           
+                *N PACKED(2:0);                                       
+                *N PACKED(1:0);                                       
+        END-PR;                                                       
+        DCL-S KEYCNT PACKED(1:0)INZ(2);                               
+               cls=5;                                                 
+               DIV='A';                                               
+               RLNO=0;                                                
+               FILL_STUDENT_LIST(CLS:DIV:RLNO:KEYCNT);                
+                       *IN72=*ON;                                       
+                 DOW NOT *IN03;                                   
+                 WRITE FOOTER;                                    
+                 EXFMT EMPCTL;                                    
+                   IF CLS>0 AND DIV=*BLANK AND RLNO=0;            
+                      KEYCNT=1;                                   
+                   ENDIF;                                         
+                   IF CLS>0 AND DIV<>*BLANK AND RLNO=0;           
+                      KEYCNT=2;                                   
+                   ENDIF;                                         
+                   IF CLS>0 AND DIV<>*BLANK AND RLNO>0;           
+                     KEYCNT=3;                                    
+                   ENDIF;                                         
+                   FILL_STUDENT_LIST(CLS:DIV:RLNO:KEYCNT);        
+                 ENDDO;                                           
+              *INLR=*ON;                                          
+       DCL-PROC FILL_STUDENT_LIST;                                
+              DCL-PI *N;                                              
+            C   PACKED(2:0);                                   
+            D   CHAR(1);                                       
+            R   PACKED(2:0);                                   
+          KEYCNT PACKED(1:0);                                  
+       END-PI;                                                 
+                                                               
+       DCL-DS STUKEYS;                                         
+          CLS PACKED(2:0);                                     
+          DIV CHAR(1);                                         
+          RLNO PACKED(2:0);                                    
+       END-DS;                                                 
+        CLS=C;                                                 
+        DIV=D;                                                 
+        RLNO=R;                                                
+                *IN72=*OFF;                                    
+                WRITE EMPCTL; //SUBFILE CLEARED                
+                        SETLL %KDS(STUKEYS:KEYCNT)STUREC;                    
+                READE %KDS(STUKEYS:KEYCNT)STUREC;                    
+                   DOW NOT %EOF;                                     
+                RRN+=1;                                              
+                WRITE EMPSFL;                                        
+                    READE %KDS(STUKEYS:KEYCNT)STUREC;                
+                          ENDDO;                                     
+                      *IN71=*ON;                                     
+                      IF RRN=0;                                      
+                          *IN71=*OFF;                                
+                      ENDIF;                                         
+    END-PROC;                                                        
+**************** End of data ****************************************
+                                                                     
+
+
+3. WRITE A PROGRAM TO RUN AN EXTERNAL COMMAND USING QCMDEXC IN FREE FORMAT 
+
+                                                            WITHPROC3R 
+  ...+... 1 ...+... 2 ...+... 3 ...+... 4 ...+... 5 ...+... 6 ...+... 7  
+ *************** Beginning of data ************************************* 
+ **FREE                                                                  
+      DCL-PR CMD EXTPGM('QCMDEXC');                                      
+               *N CHAR(50) CONST;                                        
+               *N PACKED(15:5) CONST;                                    
+      END-PR;                                                            
+                                                                         
+      DCL-S STR1 CHAR(50) INZ('CRTSRCPF FILE(ANIJA291/AJASRC)');         
+              CMD(STR1:50);//CALL                                        
+        *INLR=*ON;                                                       
+ ****************** End of data **************************************** 
+
+
+4.  WRITE A PROGRAM TO REPLACE A WORD FROM TEXT USING SCANRPL
+
+
+  *. 1 ...+... 2 ...+... 3 ...+... 4 ...+... 5 ...+... 6 ...+... 7 ...+. 
+ *************** Beginning of data ************************************* 
+ ** FREE                                                                 
+     DCL-S TXT1 CHAR(50) INZ('NISHANT IS INACTIVE PERSON');              
+     DCL-S TXT2 CHAR(50);                                                
+     DCL-S ARY CHAR(15) DIM(10);                                         
+     DCL-S X INT(5) INZ(1);                                              
+           TXT2 = %SCANRPL('INACTIVE':'INTELLIGENT':TXT1);               
+           DSPLY TXT2;                                                   
+           ARY=%SPLIT(TXT2);                                             
+           DOW X<=10;                                                    
+             DSPLY ARY(X);                                               
+             X+=1;                                                       
+             ENDDO;                                                      
+           *INLR=*ON;                                                    
+ ****************** End of data **************************************** 
+                                                                                                                                                       

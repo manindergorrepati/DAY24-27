@@ -1,0 +1,199 @@
+1. WRITE A PROGRAM TO LEARN ABOUT THE DECLARATIVE FUNCTIONS OF FREE FORMAT RPGLE.  
+
+                                                                 DCLSR 
+ *. 1 ...+... 2 ...+... 3 ...+... 4 ...+... 5 ...+... 6 ...+... 7 ...+. 
+*************** Beginning of data ************************************* 
+** FREE                                                                 
+       DCL-S A CHAR(20) INZ('ONAM WISHES');                             
+       DCL-S B PACKED(7:2) INZ(12345.67);                               
+       DCL-S C ZONED(5:2) INZ(123.45);                                  
+       DCL-S D PACKED(7:2) INZ(*ZEROS);                                 
+         D = B + C;                                                     
+         DSPLY D;                                                       
+         DSPLY A;                                                       
+         *INLR=*ON;                                                     
+****************** End of data **************************************** 
+
+ 2.    WRITE A PROGRAM TO GENERATE XML USING SQLRPGLE
+
+                                                              GENXML1FSR
+ DName+++++++++++ETDsFrom+++To/L+++IDc.Keywords+++++++++++++++++++++++++
+ *************** Beginning of data *************************************
+ DID               S              6P 0                                  
+ DNM               S             20A                                    
+ DDP               S              2P 0                                  
+ DGEN              S              1A                                    
+ DSAL              S              8P 2                                  
+ DXMLLINE          S             40A                                    
+ DPATH             S             25A   INZ('/HOME/ONAMAJA/USTEMPXML')   
+ C/EXEC SQL                                                             
+ C+ DECLARE C1 CURSOR FOR SELECT * FROM USTEMP                          
+ C/END-EXEC                                                             
+ C/EXEC SQL                                                             
+ C+ OPEN C1                                                             
+ C/END-EXEC                                                             
+ C/EXEC SQL                                                             
+ C+ CALL QSYS2/IFS_WRITE_UTF8(:PATH,'<EMP>',END_OF_LINE=>'CRLF')        
+ C/END-EXEC 
+  C                   DOW       SQLCODE>=0                               
+ C/EXEC SQL                                                             
+ C+ FETCH NEXT FROM C1 INTO :ID, :NM, :DP, :GEN, :SAL                   
+ C/END-EXEC                                                             
+ C                   IF        SQLCODE<0 OR SQLCODE=100                 
+ C                   LEAVE                                              
+ C                   ENDIF                                              
+ C/EXEC SQL                                                             
+ C+ CALL QSYS2/IFS_WRITE_UTF8(:PATH,'<REC>',END_OF_LINE=>'CRLF')        
+ C/END-EXEC                                                             
+ C                   EVAL      XMLLINE='<EMPID>'+%CHAR(ID)+'</EMPID>'   
+ C/EXEC SQL                                                             
+ C+ CALL QSYS2/IFS_WRITE_UTF8(:PATH,:XMLLINE,END_OF_LINE=>'CRLF')       
+ C/END-EXEC                                                             
+ C                   EVAL      XMLLINE='<NAME>'+%TRIM(NM)+'</NAME>'     
+ C/EXEC SQL                                                             
+ C+ CALL QSYS2/IFS_WRITE_UTF8(:PATH,:XMLLINE,END_OF_LINE=>'CRLF')       
+C/END-EXEC                                                             
+C                   EVAL      XMLLINE='<DEPT>'+%CHAR(DP)+'</DEPT>'     
+C*                                                                     
+C/EXEC SQL                                                             
+C+ CALL QSYS2/IFS_WRITE_UTF8(:PATH,:XMLLINE,END_OF_LINE=>'CRLF')       
+C/END-EXEC                                                             
+C                   EVAL      XMLLINE='<GENDER>'+%TRIM(GEN)+'</GENDER>'
+C*                                                                     
+C/EXEC SQL                                                             
+C+ CALL QSYS2/IFS_WRITE_UTF8(:PATH,:XMLLINE,END_OF_LINE=>'CRLF')       
+C/END-EXEC                                                             
+C                   EVAL      XMLLINE='<SALARY>'+%CHAR(SAL)+'</SALARY>'
+C/EXEC SQL                                                             
+C+ CALL QSYS2/IFS_WRITE_UTF8(:PATH,:XMLLINE,END_OF_LINE=>'CRLF')       
+C/END-EXEC                                                             
+C/EXEC SQL  
+C+ CALL QSYS2/IFS_WRITE_UTF8(:PATH,'</REC>',END_OF_LINE=>'CRLF')       
+C/END-EXEC                                                             
+C                   ENDDO                                              
+C/EXEC SQL                                                             
+C+ CALL QSYS2/IFS_WRITE_UTF8(:PATH,'</EMP>',END_OF_LINE=>'CRLF')       
+C/END-EXEC                                                             
+C/EXEC SQL                                                             
+C+ CLOSE C1                                                            
+C/END-EXEC                                                             
+C                   EVAL      *INLR=*ON                                
+****************** End of data ****************************************
+          
+3 WRITE A PROGRAM TO GENERATE XML USING FREE FORMAT RPGLE
+
+** FREE                                                            
+   DCL-S XMLDATA SQLTYPE(XML_CLOB:3000) CCSID(37) ;                
+   DCL-S OUTFILE SQLTYPE(CLOB_FILE) ;                              
+   DCL-S DATA SQLTYPE(CLOB:1000000) CCSID(*UTF8) ;                 
+   DCL-S CHANGED VARCHAR(3000) ;                                   
+   DCL-S PATH VARCHAR(100) INZ('/HOME/ONAMAJA/XMLFILE.XML');       
+   EXEC SQL SET OPTION COMMIT=*NONE,CLOSQLCSR=*ENDMOD ;            
+   EXEC SQL VALUES(SELECT XMLGROUP((EMPID) AS "EMPID",             
+                                   RTRIM(ENAME) AS "NAME",         
+                                        (SALARY) AS "SALARY",      
+                                   RTRIM(GENDER) AS "GENDER",      
+                                        (DEPT) AS "DEPT"           
+                          OPTION ROW "REC" ROOT "EMPLOYEE")        
+                          FROM USTEMP)                             
+                   INTO :XMLDATA ;                                 
+            CLEAR OUTFILE ;      
+OUTFILE_NAME = %TRIMR(PATH) ;                               
+OUTFILE_NL = %LEN(%TRIMR(OUTFILE_NAME)) ;                   
+OUTFILE_FO = SQFCRT ;                                       
+CHANGED = XMLDATA_DATA ;                                    
+DATA_DATA = %SCANRPL('IBM037':'UTF-8':CHANGED) ;            
+DATA_LEN = %LEN(%TRIMR(DATA_DATA)) ;                        
+EXEC SQL SET :OUTFILE = :DATA ;                             
+*INLR = *ON;                                                
+****** End of data **************************************** 
+                                                                                              
+                                                                   
+
+4. WRITE A PROGRAM TO READ ALL THE RECORDS OF USTEMP FILE TO A SUBFILE USING FREE FROMAT RPGLE.
+
+** FREE                                                                 
+       CTL-OPT datfmt(*eur);                                            
+       dcl-f ustemp disk usage(*input) RENAME(USTEMP:EMPREC);           
+       dcl-f USTQRYD workstn sfile(empsfl:rrn);                         
+       dcl-s rrn packed(3:0) inz(*zeros);                               
+                 *in72=*off;//SFLCLR                                    
+                 WRITE EMPCTL;                                          
+                      //SETLL *LOVAL EMPREC;                            
+                       //NOTE: THE FILE IS CREATED THROUGH SQL          
+                       //SO IT DOES NOT HAVE REDFMT .. FILENAME IS USED 
+                         READ EMPREC;                                   
+                             DOW NOT %EOF(USTEMP);                      
+                                RRN+=1;                                 
+                                WRITE EMPSFL;                           
+                                READ EMPREC;                            
+                             ENDDO;    
+                  *IN71=*ON;                                    
+                 *IN72=*ON;                                    
+                 EXFMT EMPCTL;                                 
+                 *INLR=*ON;                                    
+                                               
+ ****************************************
+
+5. WRITE A PROGRAM TO ADD NUMBERS USING SUB-PROCEDURE FREE FORMAT RPGLE.
+
+** FREE                                                                 
+       CTL-OPT DFTACTGRP(*NO);                                          
+       DCL-C CNS CONST('THE SUM : '); // DEFINES NAMED CONSTANT         
+       DCL-PR GETSUM PACKED(7:2);                                       
+          *N PACKED(7:2) CONST;  // CAN PASS CONST TO PARAM AS VALUE    
+         *N ZONED(3:1) CONST;                                           
+         *N INT(5:0) CONST;                                             
+       END-PR;                                                          
+       DCL-S RESULT PACKED(7:2) INZ(*ZEROS);                            
+          RESULT=GETSUM(12.5:15.3:5);//CONSTANTS PASSED                 
+          DSPLY RESULT;                                                 
+          *INLR=*ON;                                                    
+       DCL-PROC GETSUM;                                                 
+          DCL-PI *N PACKED(7:2); //pi- parameter interface(return type) 
+             A PACKED(7:2) CONST;                                       
+             B ZONED(3:1)CONST;         
+             C INT(5:0)CONST;                                          
+           END-PI;                                                      
+           DCL-S Z PACKED(7:2);                                         
+               Z=A+B+C;                                                 
+               RETURN Z;                                                
+        END-PROC;                                                       
+ ****************** End of data ****************************************
+                                                                        
+                                                                        
+ 6.  WRITE A PROGRAM TO GET A LONGEST NAME FROM ARRAY USING SUB-PROCEDURE USING FREE FORMAT RPGLE.     
+
+ **free                                                          
+       ctl-opt dftactgrp(*no);                                   
+       dcl-pr getlongest char(20);                               
+       *n char(20) dim(5);                                       
+       end-pr;                                                   
+       dcl-s ary char(20) dim(5);                                
+       dcl-s name char(20);                                      
+         ary(1)='A';                                             
+         ary(2)='ABC';                                           
+         ary(3)='AB';                                            
+             ary(4)='AbcdD;                                      
+                  ary(4)='D';                                    
+                  name= getLongest(ary);                         
+                  dsply name;                                    
+                  *inlr=*on;                                     
+             dcl-proc getLongest;    
+            dcl-pi *n char(20);                                           
+             names char(20) dim(5);                                    
+         end-pi;                                                       
+             dcl-s longest char(20);                                   
+             dcl-s x packed(2:0) inz(2);                               
+                longest=names(1);                                      
+                dow x<5;                                               
+                     if %len(%trim(names(x)))> %len(%trim(longest));   
+                        longest=names(x);                              
+                     endif;                                            
+                     x+=1;                                             
+                enddo;                                                 
+                return longest;                                        
+             end-proc;                                                 
+***************** End of data ****************************************                                                                                                                  
+                                                                      
+                                                                                                                                                                                                                                                       

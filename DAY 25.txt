@@ -1,0 +1,30 @@
+1. IMPLEMENTED SQL SCRIPTING WITHOUT STRSQL AND USING RUNSQLSTM
+
+INSERT INTO ANIJA291/USTEMP VALUES(1, 'ASWIN', 10, 'M', 65000);    
+INSERT INTO ANIJA291/USTEMP VALUES(2, 'ASWATHY', 20, 'F', 80000);  
+INSERT INTO ANIJA291/USTEMP VALUES(3, 'BESSY', 10, 'M', 65000);    
+INSERT INTO ANIJA291/USTEMP VALUES(4, 'VISHNU', 20, 'M', 88000);   
+INSERT INTO ANIJA291/USTEMP VALUES(5, 'MANI', 20, 'M', 35000);     
+INSERT INTO ANIJA291/USTEMP VALUES(6, 'SNEHA', 30, 'F', 85000);    
+INSERT INTO ANIJA291/USTEMP VALUES(7, 'MANEESHA', 10, 'F', 75000); 
+INSERT INTO ANIJA291/USTEMP VALUES(8, 'ASWINI', 10, 'F', 65000);   
+INSERT INTO ANIJA291/USTEMP VALUES(9, 'KARTHIKA', 10, 'F', 65000); 
+INSERT INTO ANIJA291/USTEMP VALUES(10, 'RUSHIN', 10, 'F', 65000);  
+INSERT INTO ANIJA291/USTEMP VALUES(11, 'SAJNA', 10, 'F', 65000);   
+
+
+2. CREATE A STREAM FILE USING SQLRPGLE.
+
+DName+++++++++++ETDsFrom+++To/L+++IDc.Keywords+++++++++++++++++++++++++
+*************** Beginning of data *************************************
+DPATH             S             27A   INZ('/HOME/ONAMAJA/TEST.TXT')    
+DTXT              S             40    INZ('HAPPY ONAM')                
+C                                                                      
+C/EXEC SQL                                                             
+C+ CALL QSYS2/IFS_WRITE_UTF8 (:PATH,                                   
+C+ :TXT, END_OF_LINE => 'CRLF')                                        
+C/END-EXEC                                                             
+C     SQLCODE       DSPLY                                              
+C                   EVAL      *INLR=*ON                                
+****************** End of data ****************************************
+                                                                       

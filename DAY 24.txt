@@ -1,0 +1,81 @@
+1.  WRITE A PROGRAM TO DISPLAY RECORD FORMAT OF ANY GIVEN FILE USING RPGLE
+
+
+h* to display record format of a given PF/LF                        
+ h* the rcd fmt is displayed in subfile                              
+ h* program uses DSPFFD *outfile and reads generated PF to fill sfl. 
+ HDFTACTGRP(*NO)                                                     
+ FEMPDSPFFD IF   E             DISK    USROPN                        
+ FDSPRCDFMTDCF   E             WORKSTN SFILE(RCDFMTSFL:RRN)          
+ DRRN              S              3P 0 INZ(0)                        
+ DCMD              S             20A   INZ('DSPFFD FILE(*CURLIB/')   
+ DFILLSFL          PR                                                
+ D                               10A                                 
+ C                   EVAL      *IN72=*ON                             
+ C                   DOW       *IN03=*OFF                            
+ C                   WRITE     FOOTER                                
+ C                   EXFMT     RCDFMTCTL                             
+ C   03              LEAVE                                           
+ C                   CALLP     FILLSFL(FNAME)                        
+C                   ENDDO                                               
+C                   EVAL      *INLR=*ON                                 
+PFILLSFL          B                                                     
+DFILLSFL          PI                                                    
+d* incoming parameter (below)                                           
+DFN                             10A                                     
+DCMDTXT           S             80A                                     
+DLEN              S             15P 5 INZ(80)                           
+C                   EVAL      CMDTXT=CMD+%TRIM(FN)+') OUTPUT(*OUTFILE)  
+C                             ' OUTFILE(*CURLIB/EMPDSPFFD) '            
+C                   CALL      'QCMDEXC'                                 
+C                   PARM                    CMDTXT                      
+C                   PARM                    LEN                         
+C                   OPEN      EMPDSPFFD                                 
+C                   EVAL      *IN72=*OFF                                
+C                   EVAL      RRN=0                                     
+C                   WRITE     RCDFMTCTL                                 
+C                   WRITE     RCDFMTCTL           
+C                   READ      EMPDSPFFD           
+C                   DOW       NOT %EOF            
+C                   EVAL      RRN=RRN+1           
+C                   WRITE     RCDFMTSFL           
+C                   READ      EMPDSPFFD           
+C                   ENDDO                         
+C                   EVAL      *IN72=*ON           
+C                   EVAL      *IN71=*ON           
+C                   IF        RRN > 1             
+C                   EVAL      *IN71=*ON           
+C                   ENDIF                         
+C                   CLOSE     EMPDSPFFD           
+C                   RETURN                        
+PFILLSFL          E                               
+
+2. WRITE A PROGRAM TO GENERATE XML USING RPGLE
+
+FEMPLOYEE9 IF   E           K DISK                                     
+FSTOREXML  O    E             DISK                                     
+DXLINE            S             80A                                    
+C                   EVAL      XLINE='<EMPLOYEE9>'                      
+C                   EVAL      XMLLINE=XLINE                            
+C                   WRITE     XMLREC                                   
+C     *LOVAL        SETLL     EMPREC                                   
+C                   READ      EMPREC                                   
+C                   DOW       NOT %EOF                                 
+C                   EVAL      XMLLINE='<REC>'                          
+C                   WRITE     XMLREC                                   
+C                   EVAL      XMLLINE='<EMPID>'+%CHAR(EMPID)+'</EMPID>'
+C                   WRITE     XMLREC                                   
+C                   EVAL      XMLLINE='<NAME>'+NAME+'</NAME>'          
+C                   WRITE     XMLREC                                   
+C                   EVAL      XMLLINE='<DEPT>'+%CHAR(DEPT)+'</DEPT'     
+C                   WRITE     XMLREC                                    
+C                   EVAL      XMLLINE='<SALARY>'+%CHAR(SALARY)+         
+C                             '</SALARY>'                               
+C                   WRITE     XMLREC                                    
+C                   EVAL      XMLLINE='</REC>'                          
+C                   WRITE     XMLREC                                    
+C                   READ      EMPREC                                    
+C                   ENDDO                                               
+C                   EVAL      XMLLINE='</EMPLOYEE9>'                    
+C                   WRITE     XMLREC                                    
+C                   EVAL      *INLR=*ON                                 
